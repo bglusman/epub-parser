@@ -56,5 +56,12 @@ class TestParser < Test::Unit::TestCase
         assert_instance_of EPUB::Publication::Package::Manifest::Item, page
       end
     end
+
+    def test_manifest_items_utf8_encoded_by_default
+      contents = @book.each_content
+
+      page = contents.first
+      assert_same page.read.encoding, Encoding.find('utf-8')
+    end
   end
 end
