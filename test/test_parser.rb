@@ -58,9 +58,7 @@ class TestParser < Test::Unit::TestCase
     end
 
     def test_manifest_items_utf8_encoded_by_default
-      contents = @book.each_content
-
-      page = contents.first
+      page = @book.each_content.first
       assert_same page.read.encoding, Encoding.find('utf-8')
     end
   end
