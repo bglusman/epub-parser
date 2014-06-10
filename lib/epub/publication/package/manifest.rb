@@ -92,7 +92,7 @@ module EPUB
 
           def read
             Zip::Archive.open(manifest.package.book.epub_file) {|zip|
-              zip.fopen(entry_name).read
+              zip.fopen(entry_name).read.force_encoding('UTF-8')
             }
           end
 
