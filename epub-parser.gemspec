@@ -3,11 +3,11 @@ $:.push File.expand_path("../lib", __FILE__)
 require "epub/parser/version"
 
 Gem::Specification.new do |s|
-  s.name        = "epub-parser"
+  s.name        = "epub-parser-io"
   s.version     = EPUB::Parser::VERSION
-  s.authors     = ["KITAITI Makoto"]
-  s.email       = ["KitaitiMakoto@gmail.com"]
-  s.homepage    = "https://github.com/KitaitiMakoto/epub-parser"
+  s.authors     = ["KITAITI Makoto, Brian Glusman"]
+  s.email       = ["KitaitiMakoto@gmail.com", "brian@glusman.me"]
+  s.homepage    = "https://github.com/bglusman/epub-parser"
   s.summary     = %q{EPUB 3 Parser}
   s.description = %q{Parse EPUB 3 book loosely}
   s.license     = 'MIT'
