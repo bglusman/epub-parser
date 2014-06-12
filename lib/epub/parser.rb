@@ -2,15 +2,16 @@ require 'epub'
 require 'epub/constants'
 require 'zipruby'
 require 'nokogiri'
+require 'tempfile'
 
 module EPUB
   class Parser
     class << self
       # Parse an EPUB file
-      # 
+      #
       # @example
       #   EPUB::Parser.parse('path/to/book.epub') # => EPUB::Book object
-      # 
+      #
       # @example
       #   class MyBook
       #     include EPUB
@@ -18,11 +19,11 @@ module EPUB
       #   book = MyBook.new
       #   parsed_book = EPUB::Parser.parse('path/to/book.epub', :book => book) # => #<MyBook:0x000000019760e8 @epub_file=..>
       #   parsed_book.equal? book # => true
-      # 
+      #
       # @example
       #   book = EPUB::Parser.parse('path/to/book.epub', :class => MyBook) # => #<MyBook:0x000000019b0568 @epub_file=...>
       #   book.instance_of? MyBook # => true
-      # 
+      #
       # @param [String] filepath
       # @param [Hash] options the type of return is specified by this argument.
       #   If no options, returns {EPUB::Book} object.
@@ -36,18 +37,42 @@ module EPUB
       def parse(filepath, options = {})
         new(filepath, options).parse
       end
+
+      def parse_io(io_stream, options = {})
+        new(io_stream, options.merge(io: true)).parse
+      end
     end
 
-    def initialize(filepath, options = {})
-      raise "File #{filepath} not readable" unless File.readable_real? filepath
+    def initialize(datasource, options = {})
+      if options[:io]
+        raise "IO source not readable" unless datasource.respond_to?(:read)
 
-      @filepath = File.realpath filepath
-      @book = create_book options
-      @book.epub_file = @filepath
+        @io_stream = datasource
+        @book = create_book options
+        file = Tempfile.new('epub_string')
+        file.write(@io_stream)
+        @filepath = file.path
+        @book.epub_file = @filepath
+      else
+        raise "File #{datasource} not readable" unless File.readable_real? datasource
+
+        @filepath = File.realpath datasource
+        @book = create_book options
+        @book.epub_file = @filepath
+      end
     end
 
     def parse
       Zip::Archive.open @filepath do |zip|
+        @book.ocf = OCF.parse(zip)
+        @book.package = Publication.parse(zip, @book.ocf.container.rootfile.full_path.to_s)
+      end
+
+      @book
+    end
+
+    def parse_io # unnecessary, but desirable maybe?
+      Zip::Archive.open_buffer @io_stream do |zip|
         @book.ocf = OCF.parse(zip)
         @book.package = Publication.parse(zip, @book.ocf.container.rootfile.full_path.to_s)
       end
