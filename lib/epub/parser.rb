@@ -39,13 +39,13 @@ module EPUB
       end
 
       def parse_io(io_stream, options = {})
-        new(io_stream, options.merge(io: true)).parse
+        new(io_stream, options.merge(io: true)).parse_io
       end
     end
 
     def initialize(datasource, options = {})
       if options[:io]
-        raise "IO source not readable" unless datasource.respond_to?(:read)
+        raise "IO source not readable" unless datasource.respond_to?(:to_s)
 
         @io_stream = datasource
         @book = create_book options
