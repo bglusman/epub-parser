@@ -47,7 +47,7 @@ module EPUB
       if options[:io]
         raise "IO source not readable" unless datasource.respond_to?(:to_s)
 
-        @io_stream = datasource
+        @io_stream = datasource.force_encoding('UTF-8')
         @book = create_book options
         file = Tempfile.new('epub_string')
         file.write(@io_stream)

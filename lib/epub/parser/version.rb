@@ -1,5 +1,5 @@
 module EPUB
   class Parser
-    VERSION = "0.1.6b"
+    VERSION = "0.1.7"
   end
 end
